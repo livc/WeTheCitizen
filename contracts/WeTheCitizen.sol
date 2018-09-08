@@ -6,14 +6,14 @@ contract WeTheCitizen {
         string content;
         uint[] rewards;
         uint total_reward;
-        uint status; // 0:unsolved 1:solved
+        uint status; // 0:unsolved 1:solved 2:unsolved
         address solver;
         address[] crowdfunders;
     }
 
     uint private issue_cnt = 0;
     mapping(uint => Issue) private issues;
-    mapping(uint => address) private solver;
+    mapping(uint => address) private solvers;
 
     // return: issue id
     function submitIssue(string submitter_name, string content) public payable returns(uint){
@@ -55,10 +55,10 @@ contract WeTheCitizen {
 
     // the process of checking is done offline by admin.
     // when an issue is solved, all reward will transfered to the solver.
-    function completeIssue(uint issue_id) public{
+    function completeIssue(uint issue_id, address solver) public{
         issues[issue_id].status = 1;
         uint allreward = issues[issue_id].total_reward;
-        msg.sender.transfer(allreward);
+        solver.transfer(allreward);
     }
 
     // if noone solve an issue for a long time, it will be closed by admin and all fund will be returned back.
