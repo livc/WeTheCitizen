@@ -1,17 +1,28 @@
 import React, { Component } from 'react';
-
-import './view.css'
-
-
 import $ from 'jquery'
 
-class View extends Component {
 
-	constructor(props) {
+
+class Table extends Component {
+
+		constructor(props) {
 		super(props)
 		this.complainContract = props.contractObject
-		this.web3 = props.web3Obj
-		console.log('Class: View')
+
+		
+		var Eth = require('web3-eth');
+
+		// "Eth.providers.givenProvider" will be set if in an Ethereum supported browser.
+		var eth = new Eth(Eth.givenProvider || 'http://127.0.0.1:9545');
+
+
+		// or using the web3 umbrella package
+
+		var Web3 = require('web3');
+		this.web3 = new Web3(Web3.givenProvider || 'http://127.0.0.1:9545');
+
+		console.log('Class: Table')
+
 
 		this.updateUser = this.updateUser.bind(this);
 		this.renderTable = this.renderTable.bind(this);
@@ -50,12 +61,12 @@ class View extends Component {
 		this.getAccounts()
 	}
 
-	catType(a) {
-        console.log('dfdsfsdf'+ a)
-        if(a==0)
-            return 'Lost'
-        else if(a==1)
-            return 'Theft'
+	getAccounts() {
+    	var context = this
+    	this.web3.eth.getAccounts().then(function(res) {
+    		context.accounts = res
+    		console.log(context.accounts)
+    	})
     }
 
     statusType(a) {
@@ -107,7 +118,8 @@ class View extends Component {
     	}
     }
 
-    actionSecondButton(e) {
+
+     actionSecondButton(e) {
     	var complain = this.fetchedComplains[e.target.getAttribute('data-index')]
     	var context = this;
     	if(this.selectUser == 1) {
@@ -170,20 +182,10 @@ class View extends Component {
 			}).catch(() => {context.setState({notification: 'Error Occured', notiClass: 'danger'})})
     }
 
-    getAccounts() {
-    	var context = this
-    	this.web3.eth.getAccounts().then(function(res) {
-    		context.accounts = res
-    		console.log(context.accounts)
-    	})
-    }
-
-
-
-	componentWillMount() {
+    componentWillMount() {
 		this.fetchedComplains = []
 		this.promiseEachComplain = []
-        this.fetchFreshData()
+        //this.fetchFreshData()
 
         var context = this
 
@@ -251,7 +253,6 @@ class View extends Component {
     	
     	console.log(this.state.classFirst)
 	}
-
 
 	renderTable() {
 		var context = this
@@ -332,7 +333,6 @@ class View extends Component {
 
 			}).catch(() => {context.setState({notification: 'Error Occured while modifying Police Accounts', notiClass: 'danger'})})
 	}
-
 	checkPolAccount() {
 		var context = this
 		var yy = []
@@ -349,13 +349,7 @@ class View extends Component {
 		console.log(yy)
 
 		this.setState({polAcc: yy})
-	} 
-
-	componentWillUpdate() {
-		//this.fetchedComplains = []
-		//this.fetchFreshData()
 	}
-
 
 	render() {
 		
@@ -371,18 +365,16 @@ class View extends Component {
 				<input type="name" className={"form-control "+this.state.secondBtn} id="input-reward" placeholder="Reward in &#8377;"/>
 				<br/>
 				<div className="panel panel-default">
-					<div className="panel-heading">Complain fetched from Blockchain</div>
+					<div className="panel-heading">Issues fetched from Blockchain</div>
 					<table className="table" id="table-data"> 
 						<thead> 
 							<tr> 
 								<th>#</th> 
 								<th>Name</th> 
-								<th>Location</th>
 								<th>Description</th>
-								<th>Type</th> 
 								<th>Reward</th> 
 								<th>Status</th> 
-								<th>Action</th>
+								<th>Evidence</th>
 							</tr> 
 						</thead>
 
@@ -458,5 +450,33 @@ class View extends Component {
 
 }
 
-	export default View;
+	export default Table;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
