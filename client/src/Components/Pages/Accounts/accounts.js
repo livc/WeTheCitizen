@@ -6,7 +6,7 @@ class Accounts extends Component {
 
 	constructor(props) {
 		super(props)
-		this.complainContract = props.contractObject
+		this.IssueContract = props.contractObject
 		this.web3 = props.web3Obj
 
 		this.state = {

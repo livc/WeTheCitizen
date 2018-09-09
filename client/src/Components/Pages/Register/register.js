@@ -7,10 +7,10 @@ import './register.css'
 class Register extends Component {
 	constructor(props) {
 		super(props)
-		this.complainContract = props.contractObject
+		this.IssueContract = props.contractObject
 		this.web3 = props.web3Obj
 		console.log('Class: Register')
-		console.log(this.complainContract)
+		console.log(this.IssueContract)
 
 		this.formPreventDefault = this.formPreventDefault.bind(this);
 		this.updateUser = this.updateUser.bind(this);
@@ -81,18 +81,18 @@ class Register extends Component {
 
         var context = this
 
-		this.complainContract.methods.registerComplain(part, longdata, latdata, catdata).send({from: this.accounts[this.selectUser], value: reward})
+		this.IssueContract.methods.registerIssue(part, longdata, latdata, catdata).send({from: this.accounts[this.selectUser], value: reward})
 		.then(function(response) {
-            context.complainContract.methods.registerComplain(part, longdata, latdata, catdata).call().then(function(cid) {
+            context.IssueContract.methods.registerIssue(part, longdata, latdata, catdata).call().then(function(cid) {
                 console.log('CID: ' + cid)
-                context.setState({notify: 'Complain Registered.', notiClass: 'success'})
-                //$('#notify').html("Complain Registered with ID: " + cid)
+                context.setState({notify: 'Issue Registered.', notiClass: 'success'})
+                //$('#notify').html("Issue Registered with ID: " + cid)
             });
             
             console.log(response)
             console.log('End of Response')
         }).catch(function(err) {
-        	context.setState({notify: 'Error: Complain not Registered.', notiClass: 'danger'})
+        	context.setState({notify: 'Error: Issue not Registered.', notiClass: 'danger'})
             console.log('Error: Message: ' + err.message);
         });
 
@@ -104,7 +104,7 @@ class Register extends Component {
 
 		
 
-		console.log(this.complainContract)
+		console.log(this.IssueContract)
 
 		
 	}*/
@@ -123,12 +123,12 @@ class Register extends Component {
 	    	})
 		}
 		else if(this.selectUser == 1) {
-			this.setState({secondBtn: 'visible', isSuperUser: 'invisible',isCitizen: 'invisible', classFirst: 'glyphicon glyphicon-arrow-up', classSecond: 'glyphicon glyphicon-arrow-down', tipFirst: 'Upgrade complain status', tipSecond: 'Downgrade complain status'}, function() {
+			this.setState({secondBtn: 'visible', isSuperUser: 'invisible',isCitizen: 'invisible', classFirst: 'glyphicon glyphicon-arrow-up', classSecond: 'glyphicon glyphicon-arrow-down', tipFirst: 'Upgrade Issue status', tipSecond: 'Downgrade Issue status'}, function() {
 	    		this.setState({table: this.renderTable()})
 	    	})
 		}
 		else if(this.selectUser == 2 || this.selectUser == 3) {
-			this.setState({secondBtn: 'visible', isSuperUser: 'invisible',isCitizen: 'visible', classFirst: 'glyphicon glyphicon-flash', classSecond: 'glyphicon glyphicon-send', tipFirst: 'Fund a complain', tipSecond: 'Report a Solution'}, function() {
+			this.setState({secondBtn: 'visible', isSuperUser: 'invisible',isCitizen: 'visible', classFirst: 'glyphicon glyphicon-flash', classSecond: 'glyphicon glyphicon-send', tipFirst: 'Fund a Issue', tipSecond: 'Report a Solution'}, function() {
 	    		this.setState({table: this.renderTable()})
 	    	})
 		}*/
@@ -152,7 +152,7 @@ class Register extends Component {
 				<hr/>
 				<br/>
 				<p>
-					To register a complain please fill the following form.
+					To register a Issue please fill the following form.
 				</p>
 				<form className="form-horizontal" onSubmit={this.formPreventDefault}>
 					<div className="form-group">
@@ -190,7 +190,7 @@ class Register extends Component {
 					</div>
 					<div className="form-group">
 						<div className="col-sm-offset-2 col-sm-10">
-							<button type="submit" className="btn btn-default btn-block" id="complain-submit" onClick={this.register}>Submit</button>
+							<button type="submit" className="btn btn-default btn-block" id="Issue-submit" onClick={this.register}>Submit</button>
 						</div>
 					</div>
 					<div className={"notify alert alert-"+this.state.notiClass}>

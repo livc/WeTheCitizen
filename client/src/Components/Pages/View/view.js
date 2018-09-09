@@ -9,7 +9,7 @@ class View extends Component {
 
 	constructor(props) {
 		super(props)
-		this.complainContract = props.contractObject
+		this.IssueContract = props.contractObject
 		this.web3 = props.web3Obj
 		console.log('Class: View')
 
@@ -34,14 +34,14 @@ class View extends Component {
 			isCitizen: 'invisible',
 			secondBtn: 'invisible',
 			polFund: 'invisible',
-			polTip: 'Fund this Complain',
+			polTip: 'Fund this Issue',
 			notification: '',
 			notiClass: 'success',
 			polAcc: []
 		}
 
-		this.fetchedComplains = []
-		this.promiseEachComplain = []
+		this.fetchedIssues = []
+		this.promiseEachIssue = []
 		this.selectUser = 0
 
 		this.accounts = []
@@ -70,16 +70,16 @@ class View extends Component {
     }
 
     actionFirstButton(e) {
-    	var complain = this.fetchedComplains[e.target.getAttribute('data-index')]
+    	var Issue = this.fetchedIssues[e.target.getAttribute('data-index')]
     	var context = this;
 
     	if(this.selectUser == 1) {
-    		console.log('Complain Status: '+complain.status)
-    		if(complain.status < 2) {
-    			this.complainContract.methods.changeStatus(complain.cid, parseInt(complain.status) + 1).send({from: this.accounts[this.selectUser]})
+    		console.log('Issue Status: '+Issue.status)
+    		if(Issue.status < 2) {
+    			this.IssueContract.methods.changeStatus(Issue.cid, parseInt(Issue.status) + 1).send({from: this.accounts[this.selectUser]})
     				.then(function(res) {
     					console.log(res)
-    					context.setState({notification: 'Complain Status Changed.', notiClass: 'success'})
+    					context.setState({notification: 'Issue Status Changed.', notiClass: 'success'})
     					context.componentWillMount()
     				}).catch(function(res) {
     					context.setState({notification: 'Error: This might not be added as a Police Account', notiClass: 'danger'})
@@ -87,32 +87,32 @@ class View extends Component {
     				})
     		}
     		else {
-    			this.setState({notification: 'Complain Status cant go above "Resolved" or "Proposed"', notiClass: 'danger'})
+    			this.setState({notification: 'Issue Status cant go above "Resolved" or "Proposed"', notiClass: 'danger'})
     		}
     		
     	}
     	else if(this.selectUser == 2 || this.selectUser == 3) {
-    		console.log("Fund : "+complain.cid)
+    		console.log("Fund : "+Issue.cid)
     		if($('#input-reward').val() == '') {
     			context.setState({notification: 'No Fund Specified. Please enter some amount.', notiClass: 'danger'})
     			return
     		}
     		var fundValue = parseInt($('#input-reward').val()) * 1e9
-    		this.complainContract.methods.fundComplain(complain.cid).send({from: this.accounts[this.selectUser], value: fundValue})
+    		this.IssueContract.methods.fundIssue(Issue.cid).send({from: this.accounts[this.selectUser], value: fundValue})
     				.then(function(res) {
     					console.log(res)
-    					context.setState({notification: 'Complain Funded', notiClass: 'success'})
+    					context.setState({notification: 'Issue Funded', notiClass: 'success'})
     					context.componentWillMount()
-    				}).catch(() => {context.setState({notification: 'Error Occured: Complain should be Accepted or Proposed', notiClass: 'danger'})})
+    				}).catch(() => {context.setState({notification: 'Error Occured: Issue should be Accepted or Proposed', notiClass: 'danger'})})
     	}
     }
 
     actionSecondButton(e) {
-    	var complain = this.fetchedComplains[e.target.getAttribute('data-index')]
+    	var Issue = this.fetchedIssues[e.target.getAttribute('data-index')]
     	var context = this;
     	if(this.selectUser == 1) {
-    		if(complain.status > 0) {
-    			this.complainContract.methods.changeStatus(complain.cid, parseInt(complain.status) - 1).send({from: this.accounts[this.selectUser]})
+    		if(Issue.status > 0) {
+    			this.IssueContract.methods.changeStatus(Issue.cid, parseInt(Issue.status) - 1).send({from: this.accounts[this.selectUser]})
     				.then(function(res) {
     					console.log(res)
     					context.setState({notification: 'Status Changed', notiClass: 'success'})
@@ -120,52 +120,52 @@ class View extends Component {
     				}).catch(() => {context.setState({notification: 'Error Dec: This might not be added as a Police Account', notiClass: 'danger'})})
     		}
     		else {
-    			this.setState({notification: 'Complain Status cant go below "Pending"', notiClass: 'danger'})
+    			this.setState({notification: 'Issue Status cant go below "Pending"', notiClass: 'danger'})
     		}
     		
     	}
     	else if(this.selectUser == 2 || this.selectUser == 3) {
-    		this.complainContract.methods.claimSolution(complain.cid).send({from: this.accounts[this.selectUser]})
+    		this.IssueContract.methods.claimSolution(Issue.cid).send({from: this.accounts[this.selectUser]})
     				.then(function(res) {
     					console.log(res)
     					context.setState({notification: 'Solution Claimed', notiClass: 'success'})
     					context.componentWillMount()
-    				}).catch(() => {context.setState({notification: 'Error Occured: You cant propose on your complain or a solution is already proposed.', notiClass: 'danger'})})
+    				}).catch(() => {context.setState({notification: 'Error Occured: You cant propose on your Issue or a solution is already proposed.', notiClass: 'danger'})})
     	}
     }
 
     actionThirdButton(e) {
-    	var complain = this.fetchedComplains[e.target.getAttribute('data-index')]
+    	var Issue = this.fetchedIssues[e.target.getAttribute('data-index')]
     	var context = this;
-    	this.complainContract.methods.resolve(complain.cid).send({from: this.accounts[this.selectUser]})
+    	this.IssueContract.methods.resolve(Issue.cid).send({from: this.accounts[this.selectUser]})
 				.then(function(res) {
     					console.log(res)
-    					context.setState({notification: 'Complain resolved and closed. Fund Transfered.', notiClass: 'success'})
+    					context.setState({notification: 'Issue resolved and closed. Fund Transfered.', notiClass: 'success'})
     					context.componentWillMount()
-    				}).catch(() => {context.setState({notification: 'Error Occured: This might not be your complain.', notiClass: 'danger'})})
+    				}).catch(() => {context.setState({notification: 'Error Occured: This might not be your Issue.', notiClass: 'danger'})})
     }
 
     actionFourthButton(e) {
-    	var complain = this.fetchedComplains[e.target.getAttribute('data-index')]
+    	var Issue = this.fetchedIssues[e.target.getAttribute('data-index')]
     	var context = this;
-    	this.complainContract.methods.declineProposal(complain.cid).send({from: this.accounts[this.selectUser]})
+    	this.IssueContract.methods.declineProposal(Issue.cid).send({from: this.accounts[this.selectUser]})
 				.then(function(res) {
     					console.log(res)
-    					context.setState({notification: 'Complain Solution declined. Set to Accept Status.', notiClass: 'success'})
+    					context.setState({notification: 'Issue Solution declined. Set to Accept Status.', notiClass: 'success'})
     					context.componentWillMount()
-    				}).catch(() => {context.setState({notification: 'Error Occured: You might not be the owner of this complain.', notiClass: 'danger'})})
+    				}).catch(() => {context.setState({notification: 'Error Occured: You might not be the owner of this Issue.', notiClass: 'danger'})})
     }
 
     actionPolFund(e) {
-    	var complain = this.fetchedComplains[e.target.getAttribute('data-index')]
+    	var Issue = this.fetchedIssues[e.target.getAttribute('data-index')]
     	var context = this;
 
     	var fundValue = parseInt($('#input-reward').val()) * 1e9
 
-    	this.complainContract.methods.fundComplain(complain.cid).send({from: this.accounts[this.selectUser], value: fundValue})
+    	this.IssueContract.methods.fundIssue(Issue.cid).send({from: this.accounts[this.selectUser], value: fundValue})
 			.then(function(res) {
 				console.log(res)
-				context.setState({notification: 'Complain Funded'})
+				context.setState({notification: 'Issue Funded'})
 				context.componentWillMount()
 			}).catch(() => {context.setState({notification: 'Error Occured', notiClass: 'danger'})})
     }
@@ -181,26 +181,26 @@ class View extends Component {
 
 
 	componentWillMount() {
-		this.fetchedComplains = []
-		this.promiseEachComplain = []
+		this.fetchedIssues = []
+		this.promiseEachIssue = []
         this.fetchFreshData()
 
         var context = this
 
-        Promise.all(this.promiseEachComplain).then(function() {
+        Promise.all(this.promiseEachIssue).then(function() {
         	context.setState({table: context.renderTable()})
         })
         
 	}
 
 	fetchFreshData() {
-		var noOfComplainsFetch = 20
+		var noOfIssuesFetch = 20
 
         var context = this
 
         var majorPromise = new Promise(function(resolve, reject) {
-            for(var i=0; i<noOfComplainsFetch; i++) {
-                context.promiseEachComplain.push(context.complainContract.methods.viewComplain(i).call())
+            for(var i=0; i<noOfIssuesFetch; i++) {
+                context.promiseEachIssue.push(context.IssueContract.methods.viewIssue(i).call())
             }
 
             resolve()
@@ -210,14 +210,14 @@ class View extends Component {
 
         var p = []
         majorPromise.then(function() {
-            for(var i=0; i<noOfComplainsFetch; i++) {
-                context.promiseEachComplain[i].then(function(response) {
+            for(var i=0; i<noOfIssuesFetch; i++) {
+                context.promiseEachIssue[i].then(function(response) {
                     console.log(response)
                     if(response[5] === "")
                         return
                     var fetchData = {cid: response[0], reward: response[1], long: response[2], lat: response[3], cat: response[4], data: atob(response[5]), status: response[6]}
 
-                    context.fetchedComplains.push(fetchData)
+                    context.fetchedIssues.push(fetchData)
                     
                 });
             }
@@ -236,12 +236,12 @@ class View extends Component {
 	    	})
 		}
 		else if(this.selectUser == 1) {
-			this.setState({polFund: 'visible', secondBtn: 'visible', isSuperUser: 'invisible',isCitizen: 'invisible', classFirst: 'glyphicon glyphicon-arrow-up', classSecond: 'glyphicon glyphicon-arrow-down', tipFirst: 'Upgrade complain status', tipSecond: 'Downgrade complain status'}, function() {
+			this.setState({polFund: 'visible', secondBtn: 'visible', isSuperUser: 'invisible',isCitizen: 'invisible', classFirst: 'glyphicon glyphicon-arrow-up', classSecond: 'glyphicon glyphicon-arrow-down', tipFirst: 'Upgrade Issue status', tipSecond: 'Downgrade Issue status'}, function() {
 	    		this.setState({table: this.renderTable()})
 	    	})
 		}
 		else if(this.selectUser == 2 || this.selectUser == 3) {
-			this.setState({polFund: 'invisible', secondBtn: 'visible', isSuperUser: 'invisible',isCitizen: 'visible', classFirst: 'glyphicon glyphicon-flash', classSecond: 'glyphicon glyphicon-send', tipFirst: 'Fund a Complain', tipSecond: 'Report a Solution'}, function() {
+			this.setState({polFund: 'invisible', secondBtn: 'visible', isSuperUser: 'invisible',isCitizen: 'visible', classFirst: 'glyphicon glyphicon-flash', classSecond: 'glyphicon glyphicon-send', tipFirst: 'Fund a Issue', tipSecond: 'Report a Solution'}, function() {
 	    		this.setState({table: this.renderTable()})
 	    	})
 		}
@@ -262,11 +262,11 @@ class View extends Component {
 		context.setState({table: pp})*/
 		//context.iconNode.props.className = 'glyphicon glyphicon-arrow-up'
 		
-		console.log(context.fetchedComplains)
+		console.log(context.fetchedIssues)
 		var reactTableRows = []
-		for(var i = 0; i<context.fetchedComplains.length; i++) {
+		for(var i = 0; i<context.fetchedIssues.length; i++) {
 
-			var fetchData = context.fetchedComplains[i]
+			var fetchData = context.fetchedIssues[i]
 			var details = fetchData.data.split('?')
 	        //console.log(details)
 
@@ -288,7 +288,7 @@ class View extends Component {
 	        		<span data-index={i} data-toggle="tooltip" data-placement="left" title={context.state.polTip} className="glyphicon glyphicon-flash" aria-hidden="true" onClick={context.actionPolFund}></span>
 	        	</span>
 	        	<span className={context.state.isCitizen+" label label-info"} >
-	        		<span data-index={i} data-toggle="tooltip" data-placement="left" title="Close/Resolve Complain [Funds will be awarded or sent back]" className="glyphicon glyphicon-ok" aria-hidden="true" onClick={context.actionThirdButton}></span>
+	        		<span data-index={i} data-toggle="tooltip" data-placement="left" title="Close/Resolve Issue [Funds will be awarded or sent back]" className="glyphicon glyphicon-ok" aria-hidden="true" onClick={context.actionThirdButton}></span>
 	        	</span>
 	        	<span className={context.state.isCitizen+" label label-danger"} >
 	        		<span data-index={i} data-toggle="tooltip" data-placement="left" title="Decline Proposal" className="glyphicon glyphicon-remove" aria-hidden="true" onClick={context.actionFourthButton}></span>
@@ -323,7 +323,7 @@ class View extends Component {
 		var accList = this.polList.split(',')
 		console.log(accList)
 		var context = this;
-		this.complainContract.methods.modifyPoliceAccounts(accList).send({from: this.accounts[this.selectUser]})
+		this.IssueContract.methods.modifyPoliceAccounts(accList).send({from: this.accounts[this.selectUser]})
 			.then(function(res) {
 				console.log(res)
 				context.setState({notification: 'Police Acoounts Modified', notiClass: 'success'})
@@ -338,7 +338,7 @@ class View extends Component {
 		var yy = []
 		var dep = []
 		for(var i =0; i<this.accounts.length; i++) {
-			dep.push(this.complainContract.methods.checkIfPoliceAccount(this.accounts[i]).call({from: this.accounts[this.selectUser]}))
+			dep.push(this.IssueContract.methods.checkIfPoliceAccount(this.accounts[i]).call({from: this.accounts[this.selectUser]}))
 		}
 
 		for(var i = 0; i<dep.length; i++) {
@@ -352,7 +352,7 @@ class View extends Component {
 	} 
 
 	componentWillUpdate() {
-		//this.fetchedComplains = []
+		//this.fetchedIssues = []
 		//this.fetchFreshData()
 	}
 
@@ -371,7 +371,7 @@ class View extends Component {
 				<input type="name" className={"form-control "+this.state.secondBtn} id="input-reward" placeholder="Reward in &#8377;"/>
 				<br/>
 				<div className="panel panel-default">
-					<div className="panel-heading">Complain fetched from Blockchain</div>
+					<div className="panel-heading">Issue fetched from Blockchain</div>
 					<table className="table" id="table-data"> 
 						<thead> 
 							<tr> 
@@ -405,9 +405,9 @@ class View extends Component {
 		        	<h5 className={this.state.secondBtn}>{this.state.tipSecond}</h5>
 		        	
 		        	<span className={this.state.isCitizen+" label label-info"} >
-		        		<span data-toggle="tooltip" data-placement="left" title="Close/Resolve Complain [Funds will be awarded or sent back]" className="glyphicon glyphicon-ok" aria-hidden="true"></span>
+		        		<span data-toggle="tooltip" data-placement="left" title="Close/Resolve Issue [Funds will be awarded or sent back]" className="glyphicon glyphicon-ok" aria-hidden="true"></span>
 		        	</span>
-		        	<h5 className={this.state.isCitizen}>Close/Resolve Complain [Funds will be awarded or sent back]</h5>
+		        	<h5 className={this.state.isCitizen}>Close/Resolve Issue [Funds will be awarded or sent back]</h5>
 		        	<span className={this.state.isCitizen+" label label-danger"} >
 		        		<span data-toggle="tooltip" data-placement="left" title="Decline Proposal" className="glyphicon glyphicon-remove" aria-hidden="true"></span>
 		        	</span>
@@ -424,8 +424,8 @@ class View extends Component {
 					<div className="col-md-6">
 							<h3>Update Police Accounts</h3>
 							<input type="name" className="form-control" id="input-address" onChange={this.updatePoliceList} placeholder="comma seperated list of account eg. 0x6f85e63bb1ed0d07a9d653b3f18b0bc389b0165b, 0x665dd2d0028473eab94584000cedcbef9fdcb7d4..." />
-							<button type="submit" className="btn btn-default btn-block" id="complain-submit" onClick={this.sendTransPolList}>Submit</button>
-							<div className="alert alert-danger" role="alert">Police account is not added to the list by default. Complain status change will fail if not added.</div>
+							<button type="submit" className="btn btn-default btn-block" id="Issue-submit" onClick={this.sendTransPolList}>Submit</button>
+							<div className="alert alert-danger" role="alert">Police account is not added to the list by default. Issue status change will fail if not added.</div>
 
 					</div>
 					<div className="col-md-6">
