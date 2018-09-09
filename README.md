@@ -4,4 +4,4 @@ A crowdfunding platform to address issues about municipal infrastructure for cit
 
 ![](./img.jpg)
 
-Presentation: [LINK](https://speakerdeck.com/livc/wethecitizen)
+Download Presentation: [LINK](https://github.com/livc/WeTheCitizen/raw/master/pre.pdf)
